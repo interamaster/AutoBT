@@ -7,6 +7,7 @@ import android.app.admin.DevicePolicyManager;
 import android.bluetooth.BluetoothAdapter;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
@@ -17,12 +18,14 @@ import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.widget.Switch;
+import android.widget.Toast;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity  {
 
     //para el device manager
 
@@ -37,6 +40,10 @@ public class MainActivity extends AppCompatActivity {
     //para los switchs
 
     Switch switcADMINButton,swtichRUNNING;
+
+    //para el log
+
+    public static final String DEBUG_TAG = "AUTOBT";
 
 
     @Override
@@ -92,7 +99,7 @@ public class MainActivity extends AppCompatActivity {
         Boolean ADMINYAOK = Myapplication.preferences.getBoolean(Myapplication.PREF_BOOL_ADMINYAOK,false);//por defecto vale 0){
         Log.d("INFO","PREF_BOOL_ADMINYAOKo: "+ADMINYAOK);
 
-
+        /*
         //1º)si ya se HIZO ADMIN empieza del tiron
 
         if ( ADMINYAOK) {
@@ -104,7 +111,7 @@ public class MainActivity extends AppCompatActivity {
                 startServiceYA();
             }
         }
-
+        */
 
 
         //2º)si no al lio
@@ -148,6 +155,7 @@ public class MainActivity extends AppCompatActivity {
             else
             {
                 switcADMINButton.setChecked(true);
+                switcADMINButton.setClickable(false);
                 // Already is a device administrator, can do security operations now.
                 //TODO asi se puede bloquear!!! : mDPM.lockNow();
             }
@@ -163,6 +171,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         final Dialog dialog = new Dialog(this);
+        dialog.setCanceledOnTouchOutside(true);
         dialog.setContentView(R.layout.dialogalertlayout);
         dialog.setTitle("INFO");
 
@@ -202,58 +211,68 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-        switcADMINButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean bChecked) {
-                if (bChecked) {
 
-                    //habilitmaos admin
+            switcADMINButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton compoundButton, boolean bChecked) {
+                    if (bChecked) {
 
-
-                    final Dialog dialog = new Dialog(MainActivity.this);
-                    dialog.setContentView(R.layout.dialogalertlayout);
-                    dialog.setTitle("INFO");
+                        //habilitmaos admin
 
 
-                    ImageButton btnExit = (ImageButton) dialog.findViewById(R.id.btnExit);
-                    btnExit.setOnClickListener(new View.OnClickListener() {
-                        @Override public void onClick(View v) {
+                        final Dialog dialog = new Dialog(MainActivity.this);
+                        dialog.setContentView(R.layout.dialogalertlayout);
+                        dialog.setCanceledOnTouchOutside(true);
+                        dialog.setTitle("INFO");
 
 
+                        dialog.setOnCancelListener(
+                                new DialogInterface.OnCancelListener() {
+                                    @Override
+                                    public void onCancel(DialogInterface dialog) {
+                                        //http://stackoverflow.com/questions/9516287/android-click-event-outside-a-dialog
+                                        //TODO When you touch outside of dialog bounds,
+                                        //TODO the dialog gets canceled and this method executes.
 
-                            dialog.dismiss();
-
-                            EnableAdmin();
-
-                            //decimos que ya se eligio
-
-
-                            Myapplication.preferences.edit().putBoolean(Myapplication.PREF_BOOL_ADMINYAOK,true).commit();
-
-
-
-                            //empezamos
-
-                            // startServiceYA();//No,,cuando le demos
+                                        switcADMINButton.setChecked(false);
+                                    }
+                                }
+                        );
 
 
+                        ImageButton btnExit = (ImageButton) dialog.findViewById(R.id.btnExit);
+                        btnExit.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
 
 
+                                dialog.dismiss();
+
+                                EnableAdmin();
+
+                                //decimos que ya se eligio
 
 
-                        }
-                    });
-                    // show dialog on screen
-                    dialog.show();
+                                Myapplication.preferences.edit().putBoolean(Myapplication.PREF_BOOL_ADMINYAOK, true).commit();
 
 
+                                //empezamos
+
+                                // startServiceYA();//No,,cuando le demos
 
 
-                } else {
+                            }
+                        });
+                        // show dialog on screen
+                        dialog.show();
 
+
+                    } else {
+
+                    }
                 }
-            }
-        });
+            });
+
 
 
     }
@@ -274,6 +293,53 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////PARA DISMISS AL TOCAR FUERA//////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        // MotionEvent object holds X-Y values
+
+
+
+        if(event.getAction() == MotionEvent.ACTION_DOWN) {
+
+            Log.d(DEBUG_TAG, "La accion ha sido ABAJO 1");
+
+            //actualzimos el valor del admin
+            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            //////////////////////////////////device manager//////////////////////////////////////////////////////
+            /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+            try
+            {
+                // Initiate DevicePolicyManager.
+                mDPM = (DevicePolicyManager)getSystemService(Context.DEVICE_POLICY_SERVICE);
+                // Set DeviceAdminDemo Receiver for active the component with different option
+                mAdminName = new ComponentName(this, DeviceAdmin.class);
+
+                if (!mDPM.isAdminActive(mAdminName)) {
+                    switcADMINButton.setChecked(false);
+
+                }
+                else
+                {
+                    switcADMINButton.setChecked(true);
+                    switcADMINButton.setClickable(false);
+                    // Already is a device administrator, can do security operations now.
+                    //TODO asi se puede bloquear!!! : mDPM.lockNow();
+                }
+            } catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+
+
+        }
+
+        return super.onTouchEvent(event);
+    }
 
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -335,10 +401,13 @@ public class MainActivity extends AppCompatActivity {
             if(requestCode == Activity.RESULT_OK)
             {
                 // done with activate to Device Admin
+                switcADMINButton.setChecked(true);
             }
             else
             {
                 // cancle it.
+                switcADMINButton.setChecked(false);
+
             }
         }
     }
@@ -370,6 +439,7 @@ public class MainActivity extends AppCompatActivity {
             else
             {
                 // Already is a device administrator, can do security operations now.
+                switcADMINButton.setClickable(false);
                 //TODO asi se puede bloquear!!! : mDPM.lockNow();
             }
         } catch (Exception e)
@@ -380,17 +450,42 @@ public class MainActivity extends AppCompatActivity {
 
     public void start(View view) {
 
-        //empezamos
+        //empezamos si no esta el admin avisamos
+
+
+        if (!switcADMINButton.isChecked()){
+
+
+            Toast.makeText(this, "YOU SHOULD ENABLE ADMIN...UP 2 YOU IF ANDROID STOP ME",  Toast.LENGTH_LONG).show();
+    }
+
+
+
 
 
         if (!isMyServiceRunning(AutoBTService.class)) {
 
-            Log.d("INFO", "ARAANCANDO SERVICE");
+            Log.d("INFO", "ARRANCANDO SERVICE");
+
+            //decimos que ya se eligio
+
+
+            Myapplication.preferences.edit().putBoolean(Myapplication.PREF_BOOL_ADMINYAOK,true).commit();
+
+
             startServiceYA();
+        }
+        else {
+
+
+            //ya estaba el service running
+
+            finish();
         }
 
 
     }
+
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //////////////////////////////////device manager//////////////////////////////////////////////////////
