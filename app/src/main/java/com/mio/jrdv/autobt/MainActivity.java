@@ -18,7 +18,9 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.CompoundButton;
 import android.widget.ImageButton;
+import android.widget.Switch;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -31,6 +33,10 @@ public class MainActivity extends AppCompatActivity {
     //para el BT
 
     BluetoothAdapter mBluetoothAdapter;
+
+    //para los switchs
+
+    Switch switcADMINButton,swtichRUNNING;
 
 
     @Override
@@ -84,7 +90,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         Boolean ADMINYAOK = Myapplication.preferences.getBoolean(Myapplication.PREF_BOOL_ADMINYAOK,false);//por defecto vale 0){
-         Log.d("INFO","PREF_BOOL_ADMINYAOKo: "+ADMINYAOK);
+        Log.d("INFO","PREF_BOOL_ADMINYAOKo: "+ADMINYAOK);
 
 
         //1º)si ya se HIZO ADMIN empieza del tiron
@@ -104,12 +110,56 @@ public class MainActivity extends AppCompatActivity {
         //2º)si no al lio
 
         setContentView(R.layout.activity_main);
+        // For first switch button
+        switcADMINButton = (Switch) findViewById(R.id.switch1);
+
+        swtichRUNNING = (Switch) findViewById(R.id.switch3);
+
+
+        if (!isMyServiceRunning(AutoBTService.class)) {
+
+            swtichRUNNING.setChecked(false);
+        }
+        else {
+            swtichRUNNING.setChecked(true);
+        }
+
 
         //To hide AppBar for fullscreen.
         ActionBar ab = getSupportActionBar();
         ab.hide();
 
 
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        //////////////////////////////////device manager//////////////////////////////////////////////////////
+        /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        try
+        {
+            // Initiate DevicePolicyManager.
+            mDPM = (DevicePolicyManager)getSystemService(Context.DEVICE_POLICY_SERVICE);
+            // Set DeviceAdminDemo Receiver for active the component with different option
+            mAdminName = new ComponentName(this, DeviceAdmin.class);
+
+            if (!mDPM.isAdminActive(mAdminName)) {
+                switcADMINButton.setChecked(false);
+
+            }
+            else
+            {
+                switcADMINButton.setChecked(true);
+                // Already is a device administrator, can do security operations now.
+                //TODO asi se puede bloquear!!! : mDPM.lockNow();
+            }
+        } catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+
+        if (!switcADMINButton.isChecked()){
+
+            //si no es admin..que lo pregunte dle tiron
 
 
         final Dialog dialog = new Dialog(this);
@@ -136,7 +186,8 @@ public class MainActivity extends AppCompatActivity {
 
                 //empezamos
 
-                startServiceYA();
+               // startServiceYA();//No,,cuando le demos
+
 
 
 
@@ -147,6 +198,62 @@ public class MainActivity extends AppCompatActivity {
         // show dialog on screen
         dialog.show();
 
+        }
+
+
+
+        switcADMINButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean bChecked) {
+                if (bChecked) {
+
+                    //habilitmaos admin
+
+
+                    final Dialog dialog = new Dialog(MainActivity.this);
+                    dialog.setContentView(R.layout.dialogalertlayout);
+                    dialog.setTitle("INFO");
+
+
+                    ImageButton btnExit = (ImageButton) dialog.findViewById(R.id.btnExit);
+                    btnExit.setOnClickListener(new View.OnClickListener() {
+                        @Override public void onClick(View v) {
+
+
+
+                            dialog.dismiss();
+
+                            EnableAdmin();
+
+                            //decimos que ya se eligio
+
+
+                            Myapplication.preferences.edit().putBoolean(Myapplication.PREF_BOOL_ADMINYAOK,true).commit();
+
+
+
+                            //empezamos
+
+                            // startServiceYA();//No,,cuando le demos
+
+
+
+
+
+
+                        }
+                    });
+                    // show dialog on screen
+                    dialog.show();
+
+
+
+
+                } else {
+
+                }
+            }
+        });
 
 
     }
@@ -269,6 +376,20 @@ public class MainActivity extends AppCompatActivity {
         {
             e.printStackTrace();
         }
+    }
+
+    public void start(View view) {
+
+        //empezamos
+
+
+        if (!isMyServiceRunning(AutoBTService.class)) {
+
+            Log.d("INFO", "ARAANCANDO SERVICE");
+            startServiceYA();
+        }
+
+
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
