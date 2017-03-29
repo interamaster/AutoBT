@@ -50,6 +50,17 @@
         android:clickable="false"/>
 
 
+    <TextView
+        android:layout_width="100dp"
+        android:layout_height="50dp"
+        android:id="@+id/in_time"
+        android:textSize="40dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignBottom="@+id/btn_time"
+        android:text="08:55"/>
+
+
     <Button
         android:layout_width="200dp"
         android:layout_height="wrap_content"
@@ -63,6 +74,17 @@
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="70dp" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="WIFI OFF TIME"
+        android:id="@+id/btn_time"
+        android:layout_below="@+id/switch3"
+        android:layout_alignEnd="@+id/switch3"
+        android:layout_marginTop="18dp"
+        android:layout_toEndOf="@+id/in_time"
+        android:onClick="TiemrChoose"/>
 
 
 </RelativeLayout>

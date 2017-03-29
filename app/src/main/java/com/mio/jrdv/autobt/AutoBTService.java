@@ -76,21 +76,20 @@ public class AutoBTService extends Service {
 
 
             String intentExtra = intent.getStringExtra(EXTRA_MESSAGE);
-             Log.v("TASK","El mensaje recibido en AutoBTService es  : "+ intentExtra);
-
+            Log.v("TASK", "El mensaje recibido en AutoBTService es  : " + intentExtra);
 
 
             //1º)vemos si es del enchufe
 
             if (intentExtra != null && intentExtra.equals("powerplug_state")) {
 
-                 Log.d("INFO","intent  powerplug_state onStartCommand EN SERVICE!!" );
+                Log.d("INFO", "intent  powerplug_state onStartCommand EN SERVICE!!");
 
                 boolean powerplugON = intent.getBooleanExtra("powerplug_state", true);
 
-               //AQUI YA SABEMOS QUE ES POR UN PLUG/UNPLUG
+                //AQUI YA SABEMOS QUE ES POR UN PLUG/UNPLUG
 
-                if (!powerplugON){
+                if (!powerplugON) {
                     //quitado el enchufe:
 
                     //1º)si o si quitamos BT si estaba encendido y  sigue sin estar enchufado
@@ -100,26 +99,22 @@ public class AutoBTService extends Service {
                         //si esta ENCENDIDO lo APAGO
                         mBluetoothAdapter.disable();
 
-                        Log.d("INFO","BT LO APAGO");
+                        Log.d("INFO", "BT LO APAGO");
 
 
                     }
 
 
-
-
-                }
-                else {
+                } else {
 
                     //puesto en enchufe!!
 
                     //primero cheqeuamos wifi:
 
 
-
-                    if(isConnectedViaWifi() && WIFIDETECT){
+                    if (isConnectedViaWifi() && WIFIDETECT) {
                         //estamos en WIFI..pasamos no hacemos nada
-                        Log.d("INFO","ESTAMOS EN WIFI y WIFIDETECT MARCADO..NO HAGO NADA");
+                        Log.d("INFO", "ESTAMOS EN WIFI y WIFIDETECT MARCADO..NO HAGO NADA");
 
                     }
 
@@ -128,22 +123,40 @@ public class AutoBTService extends Service {
                         //lo encendemos el BT
                         mBluetoothAdapter.enable();
 
-                        Log.d("INFO","BT LO ENCIENDO!!");
+                        Log.d("INFO", "BT LO ENCIENDO!!");
 
                         //TODO SONIDO
 
                     }
 
 
-                    }
+                }
 
 
             }
+
+
+            //2º)vemos si es desdeMain por cambiar WIFITIMER
+
+
+            if (intentExtra != null && intentExtra.equals("wifitimerChangeFromMain")) {
+
+                Log.d("INFO", "RECIBIDO WIFI TIMER CHANGE ON SERVICE");
+
+
+                //RECUPERAMOS LAS PREFS
+
+
+                int newHoraWIFITIMER = Myapplication.preferences.getInt(Myapplication.PREF_HORA_WIFI_OFF,8);//por defecto vale FALSE
+                int newMinWIFITIMER = Myapplication.preferences.getInt(Myapplication.PREF_MIN_WIFI_OFF,55);//por defecto vale FALSE
+
+
+                Log.d("INFO", "VALORES DE HORA Y MIN RECUPERAOS DE PREFS:"+newHoraWIFITIMER +" "+newMinWIFITIMER);
+
+
+            }
+
         }
-
-
-
-
 
 
         //return super.onStartCommand(intent, flags, startId);

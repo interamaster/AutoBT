@@ -3,6 +3,7 @@ package com.mio.jrdv.autobt;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.Dialog;
+import android.app.TimePickerDialog;
 import android.app.admin.DevicePolicyManager;
 import android.bluetooth.BluetoothAdapter;
 import android.content.ComponentName;
@@ -20,10 +21,15 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.widget.Switch;
+import android.widget.TextView;
+import android.widget.TimePicker;
 import android.widget.Toast;
+
+import java.util.Calendar;
 
 public class MainActivity extends AppCompatActivity  {
 
@@ -44,6 +50,13 @@ public class MainActivity extends AppCompatActivity  {
     //para el log
 
     public static final String DEBUG_TAG = "AUTOBT";
+
+    //para el  TIMER
+
+    Button   btnTimePicker;
+    TextView txtTime;
+    private int   mHour, mMinute;
+
 
 
     @Override
@@ -116,6 +129,12 @@ public class MainActivity extends AppCompatActivity  {
         switchWIFIDETECT=(Switch) findViewById(R.id.switch2);
 
 
+        //para el timer
+
+        btnTimePicker=(Button)findViewById(R.id.btn_time);
+
+        txtTime=(TextView) findViewById(R.id.in_time);
+
 
         //1ºA)si ya se HIZO ADMIN empieza del tiron
 
@@ -125,7 +144,7 @@ public class MainActivity extends AppCompatActivity  {
             if (!isMyServiceRunning(AutoBTService.class)) {
 
                 Log.d("INFO", "ARAANCANDO SERVICE");
-                startServiceYA();
+               // startServiceYA();//lo quitamos o se cierra del tiron!!!
 
                 switcADMINButton.setChecked(true);
             }
@@ -551,6 +570,55 @@ public class MainActivity extends AppCompatActivity  {
             finish();
         }
 
+
+    }
+
+    public void TiemrChoose(View view) {
+
+        // Get Current Time
+        final Calendar c = Calendar.getInstance();
+        mHour = c.get(Calendar.HOUR_OF_DAY);
+        mMinute = c.get(Calendar.MINUTE);
+
+        // Launch Time Picker Dialog
+        TimePickerDialog timePickerDialog = new TimePickerDialog(this,
+                new TimePickerDialog.OnTimeSetListener() {
+
+                    @Override
+                    public void onTimeSet(TimePicker view, int hourOfDay,
+                                          int minute) {
+
+                        txtTime.setText(hourOfDay + ":" + minute);
+
+
+                        //guardamos esos valores
+
+
+                        Myapplication.preferences.edit().putInt(Myapplication.PREF_HORA_WIFI_OFF,hourOfDay).commit();
+
+                        Myapplication.preferences.edit().putInt(Myapplication.PREF_MIN_WIFI_OFF,minute).commit();
+
+
+                        //reiniciamos el service con esos valores nuevos sin finish y  con EXTRA:wifitimerChangeFromMain!!!
+
+                            restartServiceMio();
+
+
+                    }
+                }, mHour, mMinute, false);
+
+
+        timePickerDialog.show();
+
+    }
+
+    private void restartServiceMio() {
+
+
+        Intent intent =new Intent(this,AutoBTService.class);
+        intent.putExtra(AutoBTService.EXTRA_MESSAGE,"wifitimerChangeFromMain");
+
+        startService(intent);
 
     }
 
