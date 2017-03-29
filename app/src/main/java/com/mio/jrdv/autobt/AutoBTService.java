@@ -63,6 +63,11 @@ public class AutoBTService extends Service {
 
         instance = this;
 
+        //RECUPERAMOS LAS PREFS
+
+
+        Boolean WIFIDETECT = Myapplication.preferences.getBoolean(Myapplication.PREF_BOOL_WIFIDETECT,false);//por defecto vale FALSE
+
 
         if (intent != null) {
 
@@ -110,13 +115,15 @@ public class AutoBTService extends Service {
 
                     //primero cheqeuamos wifi:
 
-                    //no esta en WIFI..encendemos BT
-//PERO primero chequeamos esta enchufado!!
-                    if(isConnectedViaWifi()){
+
+
+                    if(isConnectedViaWifi() && WIFIDETECT){
                         //estamos en WIFI..pasamos no hacemos nada
-                        Log.d("INFO","ESTAMOS EN WIFI..NO HAGO NADA");
+                        Log.d("INFO","ESTAMOS EN WIFI y WIFIDETECT MARCADO..NO HAGO NADA");
 
                     }
+
+                    //PERO primero chequeamos esta enchufado!!
                     else if (isPlugged(instance)) {
                         //lo encendemos el BT
                         mBluetoothAdapter.enable();

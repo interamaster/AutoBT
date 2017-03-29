@@ -39,7 +39,7 @@ public class MainActivity extends AppCompatActivity  {
 
     //para los switchs
 
-    Switch switcADMINButton,swtichRUNNING;
+    Switch switcADMINButton,swtichRUNNING,switchWIFIDETECT;
 
     //para el log
 
@@ -97,10 +97,27 @@ public class MainActivity extends AppCompatActivity  {
 
 
         Boolean ADMINYAOK = Myapplication.preferences.getBoolean(Myapplication.PREF_BOOL_ADMINYAOK,false);//por defecto vale 0){
+
+
+
         Log.d("INFO","PREF_BOOL_ADMINYAOKo: "+ADMINYAOK);
 
-        /*
-        //1º)si ya se HIZO ADMIN empieza del tiron
+
+        Boolean WIFIDETECT = Myapplication.preferences.getBoolean(Myapplication.PREF_BOOL_WIFIDETECT,false);//por defecto vale 0){
+
+        Log.d("INFO","PREF_BOOL_WIFIDETECT: "+WIFIDETECT);
+
+        setContentView(R.layout.activity_main);
+        // For first switch button
+        switcADMINButton = (Switch) findViewById(R.id.switch1);
+
+        swtichRUNNING = (Switch) findViewById(R.id.switch3);
+
+        switchWIFIDETECT=(Switch) findViewById(R.id.switch2);
+
+
+
+        //1ºA)si ya se HIZO ADMIN empieza del tiron
 
         if ( ADMINYAOK) {
 
@@ -109,19 +126,31 @@ public class MainActivity extends AppCompatActivity  {
 
                 Log.d("INFO", "ARAANCANDO SERVICE");
                 startServiceYA();
+
+                switcADMINButton.setChecked(true);
             }
         }
-        */
+
+        else {
+
+            switcADMINButton.setChecked(false);
+        }
 
 
-        //2º)si no al lio
 
-        setContentView(R.layout.activity_main);
-        // For first switch button
-        switcADMINButton = (Switch) findViewById(R.id.switch1);
+        //1ºB)si ya se HABILITO WIFI
 
-        swtichRUNNING = (Switch) findViewById(R.id.switch3);
+        if ( WIFIDETECT) {
 
+            switchWIFIDETECT.setChecked(true);
+
+        }
+        else{
+            switchWIFIDETECT.setChecked(false);
+        }
+
+
+        //1ºC)si ya eata RUNNNING
 
         if (!isMyServiceRunning(AutoBTService.class)) {
 
@@ -136,6 +165,9 @@ public class MainActivity extends AppCompatActivity  {
         ActionBar ab = getSupportActionBar();
         ab.hide();
 
+
+
+        //2º)si no al lio
 
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         //////////////////////////////////device manager//////////////////////////////////////////////////////
@@ -210,7 +242,7 @@ public class MainActivity extends AppCompatActivity  {
         }
 
 
-
+    //LISTENER DEL SWITCH ADMIN
 
             switcADMINButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
@@ -272,6 +304,42 @@ public class MainActivity extends AppCompatActivity  {
                     }
                 }
             });
+
+
+
+
+
+        //LISTENER DEL SWITCH WIFI
+
+        switchWIFIDETECT.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean bChecked) {
+                if (bChecked) {
+
+                    //habilitmaos wifi
+
+
+                            //decimos que ya se eligioPREF que si al wifi
+
+
+                            Myapplication.preferences.edit().putBoolean(Myapplication.PREF_BOOL_WIFIDETECT, true).commit();
+
+
+
+                } else {
+
+
+                    //decimos que ya se eligioPREF que NO al wifi
+
+
+                    Myapplication.preferences.edit().putBoolean(Myapplication.PREF_BOOL_WIFIDETECT, false).commit();
+
+                }
+            }
+        });
+
+
+
 
 
 
