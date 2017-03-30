@@ -59,7 +59,7 @@
         android:layout_alignParentStart="true"
         android:layout_marginStart="200dp"
         android:checked="true"
-        android:clickable="false"/>
+        android:clickable="true"/>
 
 
     <TextView
@@ -85,7 +85,7 @@
         android:layout_weight="1"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="70dp" />
+        android:layout_marginBottom="10dp" />
 
     <Button
         android:layout_width="wrap_content"
@@ -97,6 +97,17 @@
         android:layout_marginTop="18dp"
         android:layout_toEndOf="@+id/in_time"
         android:onClick="TiemrChoose"/>
+
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/instext"
+        android:textSize="15dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/btn_time"
+        android:text="@string/info"/>
 
 
 </RelativeLayout>

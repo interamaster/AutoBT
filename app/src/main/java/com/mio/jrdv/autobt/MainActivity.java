@@ -650,6 +650,8 @@ public class MainActivity extends AppCompatActivity  {
 
 
             //ya estaba el service running
+            //pero aun asi lo relanzamos por si se cambio algo..
+            startServiceYA();
 
             finish();
         }
