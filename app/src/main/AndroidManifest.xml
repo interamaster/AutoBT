@@ -7,6 +7,9 @@
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
     //permiso para saber si esta en WIFI
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    //PERMISO PARA APAGAR WIFI
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE"></uses-permission>
+
 
     <application
         android:name=".Myapplication"
@@ -49,6 +52,9 @@
                 <action android:name="android.intent.action.ACTION_POWER_DISCONNECTED" />
             </intent-filter>
         </receiver>
+
+        //para alarmaWIFIOFF
+        <receiver android:name=".AlarmIntentReceiver" />
 
         <service
             android:name=".AutoBTService"

@@ -45,7 +45,7 @@ public class MainActivity extends AppCompatActivity  {
 
     //para los switchs
 
-    Switch switcADMINButton,swtichRUNNING,switchWIFIDETECT;
+    Switch switcADMINButton,swtichRUNNING,switchWIFIDETECT,switchAutoWIFIOFF;
 
     //para el log
 
@@ -120,6 +120,12 @@ public class MainActivity extends AppCompatActivity  {
 
         Log.d("INFO","PREF_BOOL_WIFIDETECT: "+WIFIDETECT);
 
+
+        Boolean AUTOWIFIOFF = Myapplication.preferences.getBoolean(Myapplication.PREF_BOOL_AUTOWIFIOFF,false);//por defecto vale 0){
+
+        Log.d("INFO","PREF_BOOL_AUTOWIFIOFF: "+AUTOWIFIOFF);
+
+
         setContentView(R.layout.activity_main);
         // For first switch button
         switcADMINButton = (Switch) findViewById(R.id.switch1);
@@ -128,12 +134,22 @@ public class MainActivity extends AppCompatActivity  {
 
         switchWIFIDETECT=(Switch) findViewById(R.id.switch2);
 
+        switchAutoWIFIOFF=(Switch) findViewById(R.id.switch4);
 
         //para el timer
 
         btnTimePicker=(Button)findViewById(R.id.btn_time);
 
         txtTime=(TextView) findViewById(R.id.in_time);
+
+        //RECUPERAMOS LAS PREFS
+
+
+        int newHoraWIFITIMER = Myapplication.preferences.getInt(Myapplication.PREF_HORA_WIFI_OFF,8);//por defecto vale FALSE
+        int newMinWIFITIMER = Myapplication.preferences.getInt(Myapplication.PREF_MIN_WIFI_OFF,55);//por defecto vale FALSE
+
+        txtTime.setText(newHoraWIFITIMER+":"+newMinWIFITIMER);
+
 
 
         //1ºA)si ya se HIZO ADMIN empieza del tiron
@@ -180,12 +196,33 @@ public class MainActivity extends AppCompatActivity  {
         }
 
 
+
+
+        //1ºD)si ya eata AUTOWIFIOFF
+
+        if (AUTOWIFIOFF) {
+
+            switchAutoWIFIOFF.setChecked(true);
+        }
+        else {
+            switchAutoWIFIOFF.setChecked(false);
+        }
+
+
         //To hide AppBar for fullscreen.
         ActionBar ab = getSupportActionBar();
         ab.hide();
 
 
 
+        //1ºE)ACTUALZAIMOS SI YA ESTA RUNNIG
+
+
+        if (!isMyServiceRunning(AutoBTService.class)) {
+
+
+            swtichRUNNING.setChecked(true);
+        }
         //2º)si no al lio
 
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -360,11 +397,54 @@ public class MainActivity extends AppCompatActivity  {
 
 
 
+        //LISTENER DEL SWITCH AUTOWIFIOFF
+
+        switchAutoWIFIOFF.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean bChecked) {
+                if (bChecked) {
+
+                    //habilitmaos AUTOWIFIOFF
+
+
+                    //decimos que ya se eligioPREF que si al wifi
+
+
+                    Myapplication.preferences.edit().putBoolean(Myapplication.PREF_BOOL_AUTOWIFIOFF, true).commit();
+
+                    //y LANZAMOS EL TIMERSCHEDULER
+                    TiemrChoose(null);
+
+
+
+                } else {
+
+
+                    //decimos que ya se eligioPREF que NO al wifi
+
+
+                    Myapplication.preferences.edit().putBoolean(Myapplication.PREF_BOOL_AUTOWIFIOFF, false).commit();
+                    //borramos LA ALARM DEL SERVICE!!
+
+                    RESETALarmEnService();
+
+                }
+            }
+        });
+
 
 
     }
 
+    private void RESETALarmEnService() {
 
+        //reinicimoa el SERVICe con EXTRA="resetAlarmAUTOWIFIOFF" para que borre la alarma
+        Intent intent =new Intent(this,AutoBTService.class);
+        intent.putExtra(AutoBTService.EXTRA_MESSAGE,"resetAlarmAUTOWIFIOFF");
+
+        startService(intent);
+
+    }
 
 
     private void startServiceYA() {
@@ -535,6 +615,10 @@ public class MainActivity extends AppCompatActivity  {
         }
     }
 
+
+
+
+
     public void start(View view) {
 
         //empezamos si no esta el admin avisamos
@@ -572,6 +656,12 @@ public class MainActivity extends AppCompatActivity  {
 
 
     }
+
+
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////poner HORA AUTOWIFIOFF//////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     public void TiemrChoose(View view) {
 
@@ -614,11 +704,37 @@ public class MainActivity extends AppCompatActivity  {
 
     private void restartServiceMio() {
 
+        //solo si esta habilitado el AUTOWIFIOFF
 
-        Intent intent =new Intent(this,AutoBTService.class);
-        intent.putExtra(AutoBTService.EXTRA_MESSAGE,"wifitimerChangeFromMain");
+        Boolean AUTOWIFIOFF = Myapplication.preferences.getBoolean(Myapplication.PREF_BOOL_AUTOWIFIOFF,false);//por defecto vale 0){
 
-        startService(intent);
+        Log.d("INFO","PREF_BOOL_AUTOWIFIOFF esta en: "+AUTOWIFIOFF);
+
+
+        if(AUTOWIFIOFF){
+
+
+
+            int newHoraWIFITIMER = Myapplication.preferences.getInt(Myapplication.PREF_HORA_WIFI_OFF,8);//por defecto vale FALSE
+            int newMinWIFITIMER = Myapplication.preferences.getInt(Myapplication.PREF_MIN_WIFI_OFF,55);//por defecto vale FALSE
+
+
+            Log.d("INFO", "VALORES DE HORA Y MIN RECUPERAOS DE PREFS:"+newHoraWIFITIMER +" "+newMinWIFITIMER);
+
+
+            Toast.makeText(this, "WIFI WILL BE OFF EVERY DAY AT:"+newHoraWIFITIMER +":"+newMinWIFITIMER,  Toast.LENGTH_LONG).show();
+
+            Intent intent =new Intent(this,AutoBTService.class);
+            intent.putExtra(AutoBTService.EXTRA_MESSAGE,"wifitimerChangeFromMain");
+
+            startService(intent);
+
+        }
+
+       else {
+
+            Toast.makeText(this, "AUTO WIFI OFF IS DISABLED...WILL NOT DO IT...",  Toast.LENGTH_LONG).show();
+        }
 
     }
 

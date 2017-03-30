@@ -1,16 +1,23 @@
 package com.mio.jrdv.autobt;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.wifi.WifiManager;
 import android.os.BatteryManager;
 import android.os.Build;
 import android.os.IBinder;
 import android.util.Log;
+
+import java.util.Calendar;
+import java.util.Date;
 
 public class AutoBTService extends Service {
 
@@ -28,12 +35,35 @@ public class AutoBTService extends Service {
 
     BluetoothAdapter mBluetoothAdapter;
 
+    //PARA LAS 24H WIFI OFF AUTO CON ALARMAMANGER BROADCASTRECEIVER
+
+    private BroadcastReceiver AlarmBrodCastReceiver;
+    private AlarmManager MiAlarmManager;
+    private PendingIntent pendingIntentAlarma;
+
 
     @Override
     public void onCreate() {
         super.onCreate();
 
         Log.d("INFO","INICIADO onCreate EN SERVICE!!");
+
+
+        //intent PARA LA ALARMA RECEIVER:
+
+        /*
+        IntentFilter filter2 = new IntentFilter("MiIntentAlarmaReseteoTimers");
+        AlarmBrodCastReceiver = new AlarmIntentReceiver();
+        registerReceiver(AlarmBrodCastReceiver, filter2);
+        */
+
+        //NO LO HAGO COMOM DICE EN TODOS LADDOS CON UN PWENDING INTENT:
+        //https://www.sitepoint.com/scheduling-background-tasks-android/
+
+        Intent alarma =new Intent(this,AlarmIntentReceiver.class);
+        pendingIntentAlarma=PendingIntent.getBroadcast(this,0,alarma,0);//1º 0=requestcode y 2º 0=flag
+
+
 
 
     }
@@ -153,9 +183,64 @@ public class AutoBTService extends Service {
 
                 Log.d("INFO", "VALORES DE HORA Y MIN RECUPERAOS DE PREFS:"+newHoraWIFITIMER +" "+newMinWIFITIMER);
 
+                //emepezamos el timer de cada 24h SEGUN E VALOR RECIBIDO DEL TIMER SCHEDULER EN MAIN
+                startAUTOWIFIOFFTIMER(newHoraWIFITIMER,newMinWIFITIMER);
+
 
             }
 
+
+
+
+            //3º)ES LA HORA DE APAGAR EL WIFI SEGN EL ALARM PROGRAMADO:
+
+            if (intentExtra != null && intentExtra.equals("Alarma_reseteo_timers")) {
+
+                Log.d("INFO", "RECIBIDO ALARM WIFI MUST BE OFF ");
+
+                WifiManager wifiManager = (WifiManager) this.getSystemService(Context.WIFI_SERVICE);
+               // wifiManager.setWifiEnabled(true);
+                wifiManager.setWifiEnabled(false);
+               // Use the following to check if it's enabled or not
+               // boolean wifiEnabled = wifiManager.isWifiEnabled();
+
+
+
+
+
+            }
+
+
+
+            //3º)ES LA HORA DE APAGAR EL WIFI SEGN EL ALARM PROGRAMADO:
+
+            if (intentExtra != null && intentExtra.equals("resetAlarmAUTOWIFIOFF")) {
+
+                Log.d("INFO", "RECIBIDO APAGAR ALARM AUTOWIFIOFF PARA QUE NO SE EJECUTE ");
+
+                //primerom anualmos la alarma anterior si existe
+
+                if (MiAlarmManager!=null){
+                    MiAlarmManager.cancel(pendingIntentAlarma);
+                    Log.d("INFO"," ANULADA LA ALARMA ");
+
+
+                }
+
+
+                //o  alo bestia!!!
+
+
+                Intent alarmIntent = new Intent(this, AlarmIntentReceiver.class);
+                pendingIntentAlarma = PendingIntent.getBroadcast(this, 0, alarmIntent, 0);
+                MiAlarmManager = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
+                MiAlarmManager.cancel(pendingIntentAlarma);
+                Log.d("INFO"," ANULADA LA ALARMA  A LO BESTIA!! ");
+
+
+
+
+            }
         }
 
 
@@ -165,6 +250,62 @@ public class AutoBTService extends Service {
 
     }
 
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////ALARM DEL AUTOWIFIOFF//////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+    private void startAUTOWIFIOFFTIMER(int HORA,int MIN) {
+
+        // Schedule to run every day in midnight
+
+        // Scheduling task at today : 00:00:22 PM
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR_OF_DAY, HORA);
+        calendar.set(Calendar.MINUTE, MIN);
+        calendar.set(Calendar.SECOND, 00);
+
+        //este time es en el pasado por eso se ejecuta del tiron
+        //asi que le añado 24 horas(1 DIA)
+
+        //calendar.add(Calendar.DATE,1);//TODO VOLVER A PONER EN RELAIDAD
+
+        Date time = calendar.getTime();
+        long timeinMilisec=calendar.getTimeInMillis();
+
+        Log.d("INFO"," TIMER WIFI-OFF EMPEZARA EL :  "+time.toString());
+
+
+        //  int period = 10000;//10secs
+        int perioddia= 1000 * 60 * 60 * 24 * 1;//24h
+
+
+        //primerom anualmos la alarma anterior si existe
+
+        if (MiAlarmManager!=null){
+            MiAlarmManager.cancel(pendingIntentAlarma);
+            Log.d("INFO"," ANULADA LA ALARMA ");
+
+
+        }
+
+
+        //o  alo bestia!!!
+
+
+        Intent alarmIntent = new Intent(this, AlarmIntentReceiver.class);
+        pendingIntentAlarma = PendingIntent.getBroadcast(this, 0, alarmIntent, 0);
+        MiAlarmManager = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
+        MiAlarmManager.cancel(pendingIntentAlarma);
+        Log.d("INFO"," ANULADA LA ALARMA  A LO BESTIA!! ");
+
+
+        MiAlarmManager=(AlarmManager)  getSystemService(Context.ALARM_SERVICE);
+        MiAlarmManager.setRepeating(AlarmManager.RTC_WAKEUP, timeinMilisec, perioddia, pendingIntentAlarma);
+    }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     //////////////////////////////////check connected to wifi//////////////////////////////////////////////////////

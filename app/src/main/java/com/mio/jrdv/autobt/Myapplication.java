@@ -27,11 +27,8 @@ public class Myapplication extends Application {
     public static final String PREF_BOOL_WIFIDETECT="NO";
     public static final String PREF_BOOL_ADMINYAOK="NO";
     public static final String PREF_MIN_WIFI_OFF="55";
-    public static final String PREF_ULTIMA_VEZ_METIO_CODE_OK="timeultimoacierto";
-    public static final String PREF_HORA_ENCENDIO_APAGOPANTALLA="horacambiopantala";
-    public static final String PREF_TIEMPO_RESTANTE_CUANDOPANTALLA_ENCENDIO="tiemporestantealencenderpantalla";
-    public static final String PREF_BOOL_USADOYA_CODE_EMERGENCIA="Boolemergecia";
-    public static final String PREF_UID_KID="UIDKID";
+    public static final String PREF_BOOL_AUTOWIFIOFF="NO";
+
 
     @Override
     public void onCreate() {
