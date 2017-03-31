@@ -198,7 +198,9 @@ public class AutoBTService extends Service {
 
                 Log.d("INFO", "RECIBIDO ALARM WIFI MUST BE OFF ");
 
-                WifiManager wifiManager = (WifiManager) this.getSystemService(Context.WIFI_SERVICE);
+               WifiManager wifiManager = (WifiManager) this.getSystemService(Context.WIFI_SERVICE);
+
+               // WifiManager wifiManager = (WifiManager) this.getSystemService(instance.WIFI_SERVICE);
                // wifiManager.setWifiEnabled(true);
                 wifiManager.setWifiEnabled(false);
                // Use the following to check if it's enabled or not
@@ -212,7 +214,7 @@ public class AutoBTService extends Service {
 
 
 
-            //3º)ES LA HORA DE APAGAR EL WIFI SEGN EL ALARM PROGRAMADO:
+            //4º)DESHABBILITAMOS EL TIMER PARA QUE NO APAGE EL WIFI PROGRAMADO
 
             if (intentExtra != null && intentExtra.equals("resetAlarmAUTOWIFIOFF")) {
 
