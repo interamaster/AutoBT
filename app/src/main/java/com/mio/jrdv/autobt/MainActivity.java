@@ -3,6 +3,7 @@ package com.mio.jrdv.autobt;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.Dialog;
+import android.app.NotificationManager;
 import android.app.TimePickerDialog;
 import android.app.admin.DevicePolicyManager;
 import android.bluetooth.BluetoothAdapter;
@@ -433,6 +434,17 @@ public class MainActivity extends AppCompatActivity  {
         });
 
 
+
+        //PERMISO MODO NO MOLESTAR (SOLO LO PEDIRA LA PRIMERA VEZ!!)
+
+
+        NotificationManager mNotificationManager = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
+
+        // Check if the notification policy access has been granted for the app.
+        if (!mNotificationManager.isNotificationPolicyAccessGranted()) {
+            Intent intent = new Intent(android.provider.Settings.ACTION_NOTIFICATION_POLICY_ACCESS_SETTINGS);
+            startActivity(intent);
+        }
 
     }
 

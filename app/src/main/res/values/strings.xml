@@ -2,5 +2,5 @@
     <string name="app_name">AutoBT</string>
 
     <string name="activaadministrator">NOW ACTIVATE THE ADMIN MANAGER TO BE ABLE TO WORK PROPERLY</string>
-    <string name="info">INFO:(c)JRDVSOFT Marzo 2017\nI WILL SIMPLY TURN ON BLUETOOTH WHEN CONNECTED TO POWER(i.e. CAR) AND OFF WHEN DISCONECTED!!\n\nTO STOP/UNISTALL FIRST DISABLE ME AS DEVICE ADMINISTRATOR(FROM SETTINGS>SECURITY) \n \nWIFI DETECT:If enable will not turn ON/OFF Bluetooth when connected to a WIFI NETWORK(i.e. charging at home)\n \nENABLE AUTOWIFI OFF:Will turn OFF WIFI at the selected time (EVERYDAY)(i.e. before get in the car)\n \nADMIN ENABLE:Ensure this aplication will be always ready/runnig </string>
+    <string name="info">INFO:(c)JRDVSOFT Marzo 2017\nI WILL SIMPLY TURN ON BLUETOOTH AND DO NOT DISTURB WHEN CONNECTED TO POWER(i.e. CAR) AND OFF WHEN DISCONECTED!!\n\nTO STOP/UNISTALL FIRST DISABLE ME AS DEVICE ADMINISTRATOR(FROM SETTINGS>SECURITY) \n \nWIFI DETECT:If enable will not turn ON/OFF Bluetooth when connected to a WIFI NETWORK(i.e. charging at home)\n \nENABLE AUTOWIFI OFF:Will turn OFF WIFI at the selected time (EVERYDAY)(i.e. before get in the car)\n \nADMIN ENABLE:Ensure this aplication will be always ready/runnig </string>
 </resources>

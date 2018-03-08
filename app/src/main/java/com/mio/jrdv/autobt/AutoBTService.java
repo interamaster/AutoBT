@@ -1,6 +1,7 @@
 package com.mio.jrdv.autobt;
 
 import android.app.AlarmManager;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
@@ -41,6 +42,12 @@ public class AutoBTService extends Service {
     private AlarmManager MiAlarmManager;
     private PendingIntent pendingIntentAlarma;
 
+    //PARA EL MODO NO MOLESTAR
+
+    private NotificationManager mNotificationManager;
+
+
+
 
     @Override
     public void onCreate() {
@@ -66,6 +73,9 @@ public class AutoBTService extends Service {
 
 
 
+        // Get the notification manager instance
+        mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+
     }
 
 
@@ -81,11 +91,11 @@ public class AutoBTService extends Service {
 
         //permisos BT:
         //Get bluetooth adapter
-        mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter(); //TODO QUITAR SOLO PUESTO PARA PROBAR EN SIMULADOR
 
         //You want to check the status when you open the app to change the button status(conncted/disconnected) through this boolean
 
-        boolean bluetoothEnabled = mBluetoothAdapter.isEnabled();
+        boolean bluetoothEnabled = mBluetoothAdapter.isEnabled();//TODO QUITAR SOLO PUESTO PARA PROBAR EN SIMULADOR
 
 
 
@@ -123,14 +133,20 @@ public class AutoBTService extends Service {
                     //quitado el enchufe:
 
                     //1º)si o si quitamos BT si estaba encendido y  sigue sin estar enchufado
-                    if (bluetoothEnabled && !isPlugged(instance))//instance=this
+                    if (bluetoothEnabled && !isPlugged(instance))//instance=this //TODO QUITAR SOLO PUESTO PARA PROBAR EN SIMULADOR
+
                     {
 
                         //si esta ENCENDIDO lo APAGO
-                        mBluetoothAdapter.disable();
+                       mBluetoothAdapter.disable(); //TODO QUITAR SOLO PUESTO PARA PROBAR EN SIMULADOR
 
                         Log.d("INFO", "BT LO APAGO");
 
+                        //MODO NO MOLESTAR QUITADO:
+
+                        Log.d("INFO", "MODO NO MOLESTAR APAGADO!!");
+
+                        mNotificationManager.setInterruptionFilter(NotificationManager.INTERRUPTION_FILTER_ALL);
 
                     }
 
@@ -151,11 +167,17 @@ public class AutoBTService extends Service {
                     //PERO primero chequeamos esta enchufado!!
                     else if (isPlugged(instance)) {
                         //lo encendemos el BT
-                        mBluetoothAdapter.enable();
+                        //mBluetoothAdapter.enable();TODO QUITAR SOLO PUESTO PARA PROBAR EN SIMULADOR
 
                         Log.d("INFO", "BT LO ENCIENDO!!");
 
                         //TODO SONIDO
+
+                        //MODO NO MOLEATR PUESTO:
+
+                        mNotificationManager.setInterruptionFilter(NotificationManager.INTERRUPTION_FILTER_NONE);
+
+                        Log.d("INFO", "MODO NO MOLESTAR ENCIENDO!!");
 
                     }
 
