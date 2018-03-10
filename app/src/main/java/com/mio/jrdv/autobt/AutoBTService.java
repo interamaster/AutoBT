@@ -146,7 +146,8 @@ public class AutoBTService extends Service {
 
                         Log.d("INFO", "MODO NO MOLESTAR APAGADO!!");
 
-                        mNotificationManager.setInterruptionFilter(NotificationManager.INTERRUPTION_FILTER_ALL);
+                       // mNotificationManager.setInterruptionFilter(NotificationManager.INTERRUPTION_FILTER_ALL);
+                        mNotificationManager.setInterruptionFilter(NotificationManager.INTERRUPTION_FILTER_PRIORITY);//mejor en priority para que `ieda sonar la musica
 
                     }
 
@@ -167,7 +168,7 @@ public class AutoBTService extends Service {
                     //PERO primero chequeamos esta enchufado!!
                     else if (isPlugged(instance)) {
                         //lo encendemos el BT
-                        //mBluetoothAdapter.enable();TODO QUITAR SOLO PUESTO PARA PROBAR EN SIMULADOR
+                       mBluetoothAdapter.enable();//TODO QUITAR SOLO PUESTO PARA PROBAR EN SIMULADOR
 
                         Log.d("INFO", "BT LO ENCIENDO!!");
 
