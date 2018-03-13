@@ -147,7 +147,7 @@ public class AutoBTService extends Service {
                         Log.d("INFO", "MODO NO MOLESTAR APAGADO!!");
 
                        // mNotificationManager.setInterruptionFilter(NotificationManager.INTERRUPTION_FILTER_ALL);
-                        mNotificationManager.setInterruptionFilter(NotificationManager.INTERRUPTION_FILTER_PRIORITY);//mejor en priority para que `ieda sonar la musica
+                        mNotificationManager.setInterruptionFilter(NotificationManager.INTERRUPTION_FILTER_ALL);
 
                     }
 
@@ -176,7 +176,7 @@ public class AutoBTService extends Service {
 
                         //MODO NO MOLEATR PUESTO:
 
-                        mNotificationManager.setInterruptionFilter(NotificationManager.INTERRUPTION_FILTER_NONE);
+                        mNotificationManager.setInterruptionFilter(NotificationManager.INTERRUPTION_FILTER_ALARMS);
 
                         Log.d("INFO", "MODO NO MOLESTAR ENCIENDO!!");
 

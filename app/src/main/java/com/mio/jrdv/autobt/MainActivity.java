@@ -35,8 +35,8 @@ import java.util.Calendar;
 public class MainActivity extends AppCompatActivity  {
 
     //v1.2 añadido Do not disturb junto con BT
-    //v1.3 cambiado el modo de Donot disturb apriority para que suene la musica!!!
-
+    //v1.3 cambiado el modo de Donot disturb apriority para que suene la musica!!!(no)
+    //v1.31 cambiado el modo de Donot disturb a INTERRUPTION_FILTER_ALARMS para que suene la musica!!!
 
     //para el device manager
 
